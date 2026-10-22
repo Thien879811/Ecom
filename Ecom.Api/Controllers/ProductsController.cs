@@ -1,12 +1,16 @@
 ﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ecom.Application.DTOs;
 using Ecom.Application.Services;
+using Ecom.Domain.Constants;
 
 namespace Ecom.Api.Controllers;
 
+// Mặc định chỉ Admin; các API xem sản phẩm mở công khai
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = Roles.Admin)]
 public class ProductsController : ControllerBase
 {
     private readonly ProductService _service;
@@ -16,12 +20,14 @@ public class ProductsController : ControllerBase
         _service = service;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<List<ProductDto>>> GetAll()
     {
         return Ok(await _service.GetAllAsync());
     }
 
+    [AllowAnonymous]
     [HttpGet("{id:int}")]
     public async Task<ActionResult<ProductDto>> GetById(int id)
     {

@@ -1,12 +1,15 @@
 ﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ecom.Application.DTOs;
 using Ecom.Application.Services;
+using Ecom.Domain.Constants;
 
 namespace Ecom.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = Roles.Admin)]
 public class CustomersController : ControllerBase
 {
     private readonly CustomerService _service;

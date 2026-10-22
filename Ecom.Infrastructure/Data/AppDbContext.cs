@@ -16,6 +16,10 @@ public class AppDbContext : DbContext
 
     public DbSet<Customer> Customers => Set<Customer>();
 
+    public DbSet<User> Users => Set<User>();
+
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
     protected override void OnModelCreating(
         ModelBuilder modelBuilder)
     {
@@ -60,6 +64,59 @@ public class AppDbContext : DbContext
             entity.Property(p => p.Phone);
 
             entity.Property(p => p.Point);
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.ToTable("Users");
+
+            entity.HasKey(u => u.Id);
+
+            entity.Property(u => u.Id)
+                .HasMaxLength(36)
+                .ValueGeneratedNever();
+
+            entity.Property(u => u.Username)
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.HasIndex(u => u.Username)
+                .IsUnique();
+
+            entity.Property(u => u.PasswordHash)
+                .IsRequired();
+
+            entity.Property(u => u.Role)
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(u => u.CreatedAt)
+                .IsRequired();
+        });
+
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.ToTable("RefreshTokens");
+
+            entity.HasKey(t => t.Id);
+
+            entity.Property(t => t.Id)
+                .HasMaxLength(36)
+                .ValueGeneratedNever();
+
+            entity.Property(t => t.TokenHash)
+                .HasMaxLength(64)
+                .IsRequired();
+
+            entity.HasIndex(t => t.TokenHash)
+                .IsUnique();
+
+            entity.Ignore(t => t.IsActive);
+
+            entity.HasOne(t => t.User)
+                .WithMany()
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
